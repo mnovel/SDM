@@ -14,18 +14,21 @@ class MasterPendidikanSeeder extends Seeder
     public function run(): void
     {
         $pendidikan = [
-            ['pendidikan' => 'SD'],
-            ['pendidikan' => 'SLTP'],
-            ['pendidikan' => 'SLTA'],
-            ['pendidikan' => 'D1'],
-            ['pendidikan' => 'D2'],
-            ['pendidikan' => 'D3'],
-            ['pendidikan' => 'D4'],
-            ['pendidikan' => 'S1'],
-            ['pendidikan' => 'S2'],
-            ['pendidikan' => 'S3'],
-            ['pendidikan' => 'Pendidikan Profesi '],
+            ['nama' => 'SD'],
+            ['nama' => 'SLTP'],
+            ['nama' => 'SLTA'],
+            ['nama' => 'D1'],
+            ['nama' => 'D2'],
+            ['nama' => 'D3'],
+            ['nama' => 'D4'],
+            ['nama' => 'S1'],
+            ['nama' => 'S2'],
+            ['nama' => 'S3'],
+            ['nama' => 'Pendidikan Profesi '],
         ];
+
+        // Kosongkan tabel sebelum memasukkan data baru
+        MasterPendidikan::query()->delete();
 
         foreach ($pendidikan as $item) {
             MasterPendidikan::create($item);

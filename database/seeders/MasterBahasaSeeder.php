@@ -13,21 +13,24 @@ class MasterBahasaSeeder extends Seeder
      */
     public function run(): void
     {
-        $bahasas = [
-            ['bahasa' => 'Indonesia'],
-            ['bahasa' => 'Inggris'],
-            ['bahasa' => 'Jepang'],
-            ['bahasa' => 'Mandarin'],
-            ['bahasa' => 'Jerman'],
-            ['bahasa' => 'Arab'],
-            ['bahasa' => 'Korea'],
-            ['bahasa' => 'Spanyol'],
-            ['bahasa' => 'Prancis'],
-            ['bahasa' => 'Italia'],
+        $bahasa = [
+            ['nama' => 'Indonesia'],
+            ['nama' => 'Inggris'],
+            ['nama' => 'Jepang'],
+            ['nama' => 'Mandarin'],
+            ['nama' => 'Jerman'],
+            ['nama' => 'Arab'],
+            ['nama' => 'Korea'],
+            ['nama' => 'Spanyol'],
+            ['nama' => 'Prancis'],
+            ['nama' => 'Italia'],
         ];
 
-        foreach ($bahasas as $bahasa) {
-            MasterBahasa::create($bahasa);
+        // Kosongkan tabel sebelum memasukkan data baru
+        MasterBahasa::truncate();
+
+        foreach ($bahasa as $item) {
+            MasterBahasa::create($item);
         }
     }
 }

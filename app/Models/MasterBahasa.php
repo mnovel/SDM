@@ -12,7 +12,7 @@ class MasterBahasa extends Model
     protected $table = 'master_bahasa';
 
     protected $fillable = [
-        'bahasa',
+        'nama',
     ];
 
     protected $hidden = [

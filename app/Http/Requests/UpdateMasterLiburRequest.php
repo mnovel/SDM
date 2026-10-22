@@ -23,7 +23,7 @@ class UpdateMasterLiburRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_libur' => ['string', 'max:255'],
+            'nama' => ['string', 'max:255'],
             'tanggal_libur' => ['date'],
             'jenis_libur' => ['in:Nasional,Regional,Lokal'],
             'status' => ['in:Aktif,Tidak Aktif'],

@@ -14,14 +14,17 @@ class MasterAgamaSeeder extends Seeder
     public function run(): void
     {
         $agama = [
-            ['nama_agama' => 'Islam'],
-            ['nama_agama' => 'Kristen'],
-            ['nama_agama' => 'Katolik'],
-            ['nama_agama' => 'Hindu'],
-            ['nama_agama' => 'Buddha'],
-            ['nama_agama' => 'Konghucu'],
-            ['nama_agama' => 'Lainnya'],
+            ['nama' => 'Islam'],
+            ['nama' => 'Kristen'],
+            ['nama' => 'Katolik'],
+            ['nama' => 'Hindu'],
+            ['nama' => 'Buddha'],
+            ['nama' => 'Konghucu'],
+            ['nama' => 'Lainnya'],
         ];
+
+        // Kosongkan tabel sebelum memasukkan data baru
+        MasterAgama::truncate();
 
         foreach ($agama as $item) {
             MasterAgama::create($item);

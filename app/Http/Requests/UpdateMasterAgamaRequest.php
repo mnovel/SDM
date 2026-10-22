@@ -23,7 +23,7 @@ class UpdateMasterAgamaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_agama' => ['required', 'string', 'max:50', 'unique:master_agama,nama_agama,' . $this->route('agama')->id],
+            'nama' => ['required', 'string', 'max:50', 'unique:master_agama,nama,' . $this->route('agama')->id],
         ];
     }
 }

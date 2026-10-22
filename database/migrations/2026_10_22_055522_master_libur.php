@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('master_libur', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_libur');
+            $table->string('nama');
             $table->date('tanggal_libur');
             $table->enum('jenis_libur', ['Nasional', 'Regional', 'Lokal'])->default('Nasional');
             $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');

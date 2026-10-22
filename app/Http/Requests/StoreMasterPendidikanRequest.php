@@ -23,7 +23,7 @@ class StoreMasterPendidikanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pendidikan' => ['required', 'string', 'max:100', 'unique:master_pendidikan,pendidikan'],
+            'nama' => ['required', 'string', 'max:100', 'unique:master_pendidikan,nama'],
         ];
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('master_bahasa', function (Blueprint $table) {
             $table->id();
-            $table->string('bahasa', 100);
+            $table->string('nama', 100);
             $table->timestamps();
         });
     }

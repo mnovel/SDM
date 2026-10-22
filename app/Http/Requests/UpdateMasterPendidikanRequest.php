@@ -23,7 +23,7 @@ class UpdateMasterPendidikanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pendidikan' => ['required', 'string', 'max:100', 'unique:master_pendidikan,pendidikan,' . $this->route('pendidikan')->id],
+            'nama' => ['required', 'string', 'max:100', 'unique:master_pendidikan,nama,' . $this->route('pendidikan')->id],
         ];
     }
 }

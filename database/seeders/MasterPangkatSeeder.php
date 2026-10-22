@@ -62,6 +62,9 @@ class MasterPangkatSeeder extends Seeder
             ]);
         }, $data);
 
+        // Kosongkan tabel sebelum memasukkan data baru
+        DB::table('master_pangkat')->truncate();
+
         // Insert semua data sekaligus
         DB::table('master_pangkat')->insert($insertData);
     }

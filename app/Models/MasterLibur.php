@@ -12,7 +12,7 @@ class MasterLibur extends Model
     protected $table = 'master_libur';
 
     protected $fillable = [
-        'nama_libur',
+        'nama',
         'tanggal_libur',
         'jenis_libur',
         'status',

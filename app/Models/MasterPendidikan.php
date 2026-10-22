@@ -11,7 +11,7 @@ class MasterPendidikan extends Model
 
     protected $table = 'master_pendidikan';
 
-    protected $fillable = ['pendidikan'];
+    protected $fillable = ['nama'];
 
     protected $hidden = ['created_at', 'updated_at'];
 

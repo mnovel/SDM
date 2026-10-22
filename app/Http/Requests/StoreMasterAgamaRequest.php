@@ -23,7 +23,7 @@ class StoreMasterAgamaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_agama' => ['required', 'string', 'max:50', 'unique:master_agama,nama_agama'],
+            'nama' => ['required', 'string', 'max:50', 'unique:master_agama,nama'],
         ];
     }
 }

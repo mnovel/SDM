@@ -23,7 +23,7 @@ class StoreMasterLiburRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_libur' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:255'],
             'tanggal_libur' => ['required', 'date'],
             'jenis_libur' => ['required', 'in:Nasional,Regional,Lokal'],
             'status' => ['required', 'in:Aktif,Tidak Aktif'],

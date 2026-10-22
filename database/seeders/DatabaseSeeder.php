@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
             MasterBahasaSeeder::class,
             MasterPendidikanSeeder::class,
             MasterPangkatSeeder::class,
+            MasterStatusPernikahanSeeder::class,
+            IndonesiaSeeder::class,
+            MasterSukuSeeder::class,
         ]);
     }
 }

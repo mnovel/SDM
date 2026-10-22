@@ -12,7 +12,7 @@ class MasterAgama extends Model
     protected $table = 'master_agama';
 
     protected $fillable = [
-        'nama_agama',
+        'nama',
     ];
 
     protected $hidden = [

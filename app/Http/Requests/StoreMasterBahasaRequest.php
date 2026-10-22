@@ -23,7 +23,7 @@ class StoreMasterBahasaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bahasa' => ['required', 'string', 'max:100', 'unique:master_bahasa,bahasa'],
+            'nama' => ['required', 'string', 'max:100', 'unique:master_bahasa,nama'],
         ];
     }
 }
