@@ -16,7 +16,7 @@ class UpdateMasterStatusPegawaiRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'max:150', 'unique:master_status_pegawai,nama,' . $this->route('statusPegawai')->id],
-            'status' => ['required', 'in:Akif,Tidak Aktif']
+            'status' => ['required', 'in:Aktif,Tidak Aktif']
         ];
     }
 }
