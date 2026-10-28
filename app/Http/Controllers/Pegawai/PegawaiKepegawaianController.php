@@ -8,13 +8,14 @@ use App\Models\PegawaiKepegawaian;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class PegawaiKepegawaianController extends Controller
 {
     public function index(Pegawai $pegawai): JsonResponse
     {
-        $data = $pegawai->riwayat_kepegawaian() // FIX: riwayat_kepegawaian
-            ->with(['unit', 'jabatan', 'status_pegawai']) // FIX: Sesuaikan nama relasi
+        $data = $pegawai->riwayat_kepegawaian()
+            ->with(['unit', 'jabatan', 'status_pegawai'])
             ->orderBy('tmt_awal', 'desc')
             ->get();
 
@@ -30,7 +31,47 @@ class PegawaiKepegawaianController extends Controller
             'tmt_awal'                 => ['required', 'date'],
             'tmt_akhir'                => ['nullable', 'date', 'after_or_equal:tmt_awal'],
             'is_aktif'                 => ['boolean'],
+            'no_sk'                    => ['required', 'string'],
         ]);
+
+        $newTmtAwal = Carbon::parse($validated['tmt_awal']);
+        $today = Carbon::today();
+
+        $latestRecord = $pegawai->riwayat_kepegawaian()->orderBy('tmt_awal', 'desc')->first();
+
+        $validated['is_aktif'] = false;
+
+        if (!$latestRecord || $newTmtAwal->greaterThan(Carbon::parse($latestRecord->tmt_awal))) {
+
+            if ($newTmtAwal->lessThanOrEqualTo($today)) {
+                $validated['is_aktif'] = true;
+
+                $pegawai->riwayat_kepegawaian()->update(['is_aktif' => false]);
+
+                if ($latestRecord) {
+                    $latestRecord->update([
+                        'tmt_akhir' => $newTmtAwal->copy()->subDay()->format('Y-m-d')
+                    ]);
+                }
+
+                $pegawai->jabatan_struktural()->delete();
+                $pegawai->jabatan_struktural()->create([
+                    'master_jabatan_id' => $validated['master_jabatan_id'],
+                    'master_unit_id'    => $validated['master_unit_id'],
+                    'no_sk'             => $validated['no_sk'],
+                    'tanggal_awal'      => $validated['tmt_awal'],
+                ]);
+            }
+        } else {
+            $nextRecord = $pegawai->riwayat_kepegawaian()
+                ->where('tmt_awal', '>', $validated['tmt_awal'])
+                ->orderBy('tmt_awal', 'asc')
+                ->first();
+
+            if ($nextRecord) {
+                $validated['tmt_akhir'] = Carbon::parse($nextRecord->tmt_awal)->subDay()->format('Y-m-d');
+            }
+        }
 
         $kepegawaian = $pegawai->riwayat_kepegawaian()->create($validated);
 

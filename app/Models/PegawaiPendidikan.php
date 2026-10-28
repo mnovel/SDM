@@ -26,6 +26,25 @@ class PegawaiPendidikan extends Model
         'tahun_lulus' => 'integer',
     ];
 
+    /**
+     * Boot events untuk sinkronisasi otomatis ke tabel Pegawai
+     */
+    protected static function booted()
+    {
+        static::saved(function ($pendidikan) {
+            if ($pendidikan->pegawai) {
+                $pendidikan->pegawai->syncPendidikanTerakhir();
+            }
+        });
+
+        // Terpicu otomatis saat Hapus (Delete)
+        static::deleted(function ($pendidikan) {
+            if ($pendidikan->pegawai) {
+                $pendidikan->pegawai->syncPendidikanTerakhir();
+            }
+        });
+    }
+
     // ==========================================
     // RELASI
     // ==========================================

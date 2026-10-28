@@ -126,12 +126,12 @@ class Pegawai extends Model
 
     public function nakes()
     {
-        return $this->hasOne(PegawaiNakes::class);
+        return $this->hasMany(PegawaiNakes::class);
     }
 
     public function rekening()
     {
-        return $this->hasOne(PegawaiRekening::class);
+        return $this->hasMany(PegawaiRekening::class);
     }
 
     // ==========================================
@@ -176,5 +176,21 @@ class Pegawai extends Model
     public function aktivitas_kerja()
     {
         return $this->hasMany(PegawaiAktivitasKerja::class)->orderBy('tanggal_mulai', 'desc');
+    }
+
+    /**
+     * Sinkronisasi Pendidikan Terakhir
+     * Mengambil riwayat pendidikan dengan tahun lulus paling baru.
+     */
+    public function syncPendidikanTerakhir()
+    {
+        // Karena di relasi 'pendidikan()' Anda sudah ada ->orderBy('tahun_lulus', 'desc')
+        // Kita cukup mengambil data pertama (yang paling baru)
+        $latestPendidikan = $this->pendidikan()->first();
+
+        // Update master_pendidikan_id di tabel pegawai
+        $this->update([
+            'master_pendidikan_id' => $latestPendidikan ? $latestPendidikan->master_pendidikan_id : null
+        ]);
     }
 }

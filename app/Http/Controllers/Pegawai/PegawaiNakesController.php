@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pegawai;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pegawai;
+use App\Models\PegawaiNakes;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,19 +12,13 @@ use Illuminate\Support\Facades\Storage;
 
 class PegawaiNakesController extends Controller
 {
-    public function show(Pegawai $pegawai): JsonResponse
+    public function index(Pegawai $pegawai): JsonResponse
     {
-        $nakes = $pegawai->nakes;
-        if (! $nakes) return ApiResponse::error('Pegawai ini belum memiliki data Nakes.', 404);
-        return ApiResponse::success($nakes, 'Detail Nakes Pegawai.');
+        return ApiResponse::success($pegawai->nakes()->orderBy('created_at', 'desc')->get(), 'Daftar Nakes berhasil diambil.');
     }
 
     public function store(Request $request, Pegawai $pegawai): JsonResponse
     {
-        if ($pegawai->nakes()->exists()) {
-            return ApiResponse::error('Pegawai ini sudah memiliki data Nakes. Gunakan method PUT untuk memperbarui.', 409);
-        }
-
         $validated = $request->validate([
             'profesi'           => ['required', 'string', 'max:255'],
             'no_str'            => ['required', 'string', 'max:50'],
@@ -46,10 +41,15 @@ class PegawaiNakesController extends Controller
         return ApiResponse::success($nakes, 'Data Nakes berhasil ditambahkan.', 201);
     }
 
-    public function update(Request $request, Pegawai $pegawai): JsonResponse
+    public function show(Pegawai $pegawai, PegawaiNakes $nakes): JsonResponse
     {
-        $nakes = $pegawai->nakes;
-        if (! $nakes) return ApiResponse::error('Data Nakes tidak ditemukan. Gunakan method POST untuk membuat.', 404);
+        if ($nakes->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
+        return ApiResponse::success($nakes, 'Detail Nakes.');
+    }
+
+    public function update(Request $request, Pegawai $pegawai, PegawaiNakes $nakes): JsonResponse
+    {
+        if ($nakes->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
 
         $validated = $request->validate([
             'profesi'           => ['sometimes', 'required', 'string', 'max:255'],
@@ -79,10 +79,9 @@ class PegawaiNakesController extends Controller
         return ApiResponse::success($nakes, 'Data Nakes berhasil diperbarui.');
     }
 
-    public function destroy(Pegawai $pegawai): JsonResponse
+    public function destroy(Pegawai $pegawai, PegawaiNakes $nakes): JsonResponse
     {
-        $nakes = $pegawai->nakes;
-        if (! $nakes) return ApiResponse::error('Data Nakes tidak ditemukan.', 404);
+        if ($nakes->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
 
         if ($nakes->file_str && Storage::disk('public')->exists($nakes->file_str)) {
             Storage::disk('public')->delete($nakes->file_str);

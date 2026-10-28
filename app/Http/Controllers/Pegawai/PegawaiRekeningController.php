@@ -4,22 +4,26 @@ namespace App\Http\Controllers\Pegawai;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pegawai;
+use App\Models\PegawaiRekening;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PegawaiRekeningController extends Controller
 {
-    public function show(Pegawai $pegawai): JsonResponse
+    /**
+     * GET /api/v1/pegawai/{pegawai}/rekening
+     */
+    public function index(Pegawai $pegawai): JsonResponse
     {
-        if (! $pegawai->rekening) return ApiResponse::error('Data Rekening tidak ditemukan.', 404);
-        return ApiResponse::success($pegawai->rekening, 'Detail Rekening Pegawai.');
+        return ApiResponse::success($pegawai->rekening()->orderBy('created_at', 'desc')->get(), 'Daftar Rekening berhasil diambil.');
     }
 
+    /**
+     * POST /api/v1/pegawai/{pegawai}/rekening
+     */
     public function store(Request $request, Pegawai $pegawai): JsonResponse
     {
-        if ($pegawai->rekening()->exists()) return ApiResponse::error('Rekening sudah ada, gunakan PUT untuk update.', 409);
-
         $validated = $request->validate([
             'nama_bank'   => ['required', 'in:BNI,Mandiri,BTN,BRI,Bank Jatim'],
             'no_rekening' => ['required', 'string', 'max:30'],
@@ -30,9 +34,21 @@ class PegawaiRekeningController extends Controller
         return ApiResponse::success($rekening, 'Data Rekening berhasil ditambahkan.', 201);
     }
 
-    public function update(Request $request, Pegawai $pegawai): JsonResponse
+    /**
+     * GET /api/v1/pegawai/{pegawai}/rekening/{rekening}
+     */
+    public function show(Pegawai $pegawai, PegawaiRekening $rekening): JsonResponse
     {
-        if (! $pegawai->rekening) return ApiResponse::error('Data Rekening tidak ditemukan.', 404);
+        if ($rekening->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
+        return ApiResponse::success($rekening, 'Detail Rekening Pegawai.');
+    }
+
+    /**
+     * PUT /api/v1/pegawai/{pegawai}/rekening/{rekening}
+     */
+    public function update(Request $request, Pegawai $pegawai, PegawaiRekening $rekening): JsonResponse
+    {
+        if ($rekening->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
 
         $validated = $request->validate([
             'nama_bank'   => ['sometimes', 'required', 'in:BNI,Mandiri,BTN,BRI,Bank Jatim'],
@@ -40,14 +56,18 @@ class PegawaiRekeningController extends Controller
             'atas_nama'   => ['sometimes', 'required', 'string', 'max:100'],
         ]);
 
-        $pegawai->rekening->update($validated);
-        return ApiResponse::success($pegawai->rekening, 'Data Rekening berhasil diperbarui.');
+        $rekening->update($validated);
+        return ApiResponse::success($rekening, 'Data Rekening berhasil diperbarui.');
     }
 
-    public function destroy(Pegawai $pegawai): JsonResponse
+    /**
+     * DELETE /api/v1/pegawai/{pegawai}/rekening/{rekening}
+     */
+    public function destroy(Pegawai $pegawai, PegawaiRekening $rekening): JsonResponse
     {
-        if (! $pegawai->rekening) return ApiResponse::error('Data Rekening tidak ditemukan.', 404);
-        $pegawai->rekening->delete();
+        if ($rekening->pegawai_id !== $pegawai->id) return ApiResponse::error('Data tidak ditemukan.', 404);
+
+        $rekening->delete();
         return ApiResponse::success(null, 'Data Rekening berhasil dihapus.');
     }
 }

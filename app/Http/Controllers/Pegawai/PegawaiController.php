@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PegawaiController extends Controller
 {
-    // Mapping variabel API -> Kolom Database
     private function mapVariables(array $data): array
     {
         $mapping = [
@@ -32,8 +31,8 @@ class PegawaiController extends Controller
 
         foreach ($mapping as $apiKey => $dbColumn) {
             if (array_key_exists($apiKey, $data)) {
-                $data[$dbColumn] = $data[$apiKey]; // Pindahkan nilainya ke nama kolom DB
-                unset($data[$apiKey]);             // Hapus key variabel bersihnya
+                $data[$dbColumn] = $data[$apiKey];
+                unset($data[$apiKey]);
             }
         }
 
@@ -42,10 +41,13 @@ class PegawaiController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-
         $query = Pegawai::query()
-            ->select(['id', 'gelar_depan', 'nama', 'gelar_belakang', 'nip', 'no_hp', 'email', 'jenis_kelamin'])
-            ->with('kepegawaian_aktif');
+            ->select(['id', 'gelar_depan', 'nama', 'gelar_belakang', 'nip', 'no_hp', 'email', 'jenis_kelamin', 'foto'])
+            ->with([
+                'kepegawaian_aktif.unit',
+                'kepegawaian_aktif.jabatan',
+                'kepegawaian_aktif.status_pegawai'
+            ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -57,6 +59,18 @@ class PegawaiController extends Controller
 
         if ($request->filled('jenis_kelamin')) {
             $query->where('jenis_kelamin', $request->jenis_kelamin);
+        }
+
+        if ($request->filled('unit_id')) {
+            $query->whereHas('kepegawaian_aktif', function ($q) use ($request) {
+                $q->where('master_unit_id', $request->unit_id);
+            });
+        }
+
+        if ($request->filled('jabatan_id')) {
+            $query->whereHas('kepegawaian_aktif', function ($q) use ($request) {
+                $q->where('master_jabatan_id', $request->jabatan_id);
+            });
         }
 
         $perPage = (int) $request->get('per_page', 15);
@@ -108,7 +122,6 @@ class PegawaiController extends Controller
     {
         $validated = $request->validated();
 
-        // PROSES MAPPING VARIABEL
         $validated = $this->mapVariables($validated);
 
         if ($request->hasFile('foto')) {
