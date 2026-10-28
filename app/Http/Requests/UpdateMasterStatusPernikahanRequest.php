@@ -23,7 +23,7 @@ class UpdateMasterStatusPernikahanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'max:150', 'unique:master_status_pernikahan,nama,' . $this->request('statusPernikahan')->id],
+            'nama' => ['required', 'max:150', 'unique:master_status_pernikahan,nama,' . $this->route('statusPernikahan')->id],
             'status' => ['required', 'in:Aktif,Tidak Aktif']
         ];
     }

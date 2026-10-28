@@ -23,7 +23,7 @@ class UpdateMasterSukuRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'max:255', 'unique:master_suku,nama,' . $this->request('suku')->id]
+            'nama' => ['required', 'max:255', 'unique:master_suku,nama,' . $this->route('suku')->id]
         ];
     }
 }
