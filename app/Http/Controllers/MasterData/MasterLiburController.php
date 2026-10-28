@@ -26,7 +26,14 @@ class MasterLiburController extends Controller
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // Pagination (default 10 per halaman)
+        if ($request->filled('jenis_libur')) {
+            $query->where('jenis_libur', $request->jenis_libur);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $perPage = $request->get('per_page', 10);
         $libur = $query->orderBy('id', 'asc')->paginate($perPage);
 
