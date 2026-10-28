@@ -15,8 +15,13 @@ class DatabaseSeeder extends Seeder
             MasterPendidikanSeeder::class,
             MasterPangkatSeeder::class,
             MasterStatusPernikahanSeeder::class,
-            IndonesiaSeeder::class,
             MasterSukuSeeder::class,
+            MasterStatusPegawaiSeeder::class,
+            MasterUnitSeeder::class,
+            MasterJabatanSeeder::class,
+            UnitJabatanSeeder::class,
+            IndonesiaSeeder::class,
+            PegawaiSeeder::class
         ]);
     }
 }

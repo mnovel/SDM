@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\MasterSuku; // Panggil Model
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MasterSukuSeeder extends Seeder
 {
@@ -12,7 +12,7 @@ class MasterSukuSeeder extends Seeder
         $csvFile = database_path('seeders/data/master_suku.csv');
 
         if (!file_exists($csvFile)) {
-            $this->command->error("File CSV tidak ditemukan di: {$csvFile}");
+            $this->command->error("❌ File CSV tidak ditemukan di: {$csvFile}");
             return;
         }
 
@@ -20,10 +20,10 @@ class MasterSukuSeeder extends Seeder
         $now = now();
 
         if (($handle = fopen($csvFile, 'r')) !== false) {
-            fgetcsv($handle);
+            fgetcsv($handle); // skip header
 
             while (($data = fgetcsv($handle)) !== false) {
-                $namaSuku = trim($data[0]);
+                $namaSuku = trim($data[0] ?? '');
 
                 if (!empty($namaSuku)) {
                     $dataToInsert[] = [
@@ -36,14 +36,18 @@ class MasterSukuSeeder extends Seeder
             fclose($handle);
         }
 
-        // Menggunakan Model, bukan DB::table
-        MasterSuku::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Masukkan per 100 baris menggunakan Model::insert()
-        foreach (array_chunk($dataToInsert, 100) as $chunk) {
-            MasterSuku::insert($chunk);
+        try {
+            DB::table('master_suku')->truncate();
+
+            foreach (array_chunk($dataToInsert, 500) as $chunk) {
+                DB::table('master_suku')->insert($chunk);
+            }
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
 
-        $this->command->info('✅ Berhasil memasukkan ' . count($dataToInsert) . ' data Suku via Model!');
+        $this->command->info('✅ MasterSukuSeeder: ' . count($dataToInsert) . ' suku di-seed dari CSV.');
     }
 }

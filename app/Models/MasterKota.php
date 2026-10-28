@@ -12,17 +12,34 @@ class MasterKota extends Model
     protected $table = 'master_kota';
 
     protected $fillable = [
-        'master_provinsi_id',
-        'nama',
+        'code',
+        'province_code',
+        'name',
+        'meta',
     ];
 
-    public function kecamatan()
-    {
-        return $this->hasMany(MasterKecamatan::class, 'master_kota_id');
-    }
+    protected $casts = [
+        'meta' => 'array',
+    ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
+     * master_kota.province_code → master_provinsi.code
+     */
     public function provinsi()
     {
-        return $this->belongsTo(MasterProvinsi::class, 'master_provinsi_id');
+        return $this->belongsTo(MasterProvinsi::class, 'province_code', 'code');
+    }
+
+    /**
+     * master_kecamatan.city_code → master_kota.code
+     */
+    public function kecamatan()
+    {
+        return $this->hasMany(MasterKecamatan::class, 'city_code', 'code');
     }
 }

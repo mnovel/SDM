@@ -2,15 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\MasterPendidikan;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MasterPendidikanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $pendidikan = [
@@ -24,14 +20,25 @@ class MasterPendidikanSeeder extends Seeder
             ['nama' => 'S1'],
             ['nama' => 'S2'],
             ['nama' => 'S3'],
-            ['nama' => 'Pendidikan Profesi '],
+            ['nama' => 'Pendidikan Profesi'],
         ];
 
-        // Kosongkan tabel sebelum memasukkan data baru
-        MasterPendidikan::query()->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        foreach ($pendidikan as $item) {
-            MasterPendidikan::create($item);
+        try {
+            DB::table('master_pendidikan')->truncate();
+
+            $now = now();
+            $data = array_map(fn($item) => array_merge($item, [
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]), $pendidikan);
+
+            DB::table('master_pendidikan')->insert($data);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
+
+        $this->command->info('✅ MasterPendidikanSeeder: ' . count($pendidikan) . ' pendidikan di-seed.');
     }
 }

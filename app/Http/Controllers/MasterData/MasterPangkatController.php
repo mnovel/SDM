@@ -9,6 +9,7 @@ use App\Models\MasterPangkat;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException; // <-- Tambahkan import ini
 
 class MasterPangkatController extends Controller
 {
@@ -26,7 +27,6 @@ class MasterPangkatController extends Controller
             $query->where('pangkat', 'like', '%' . $request->search . '%');
         }
 
-        // Pagination (default 20 per halaman)
         $perPage = $request->get('per_page', 20);
         $pangkat = $query->orderBy('id', 'asc')->paginate($perPage);
 
@@ -40,13 +40,17 @@ class MasterPangkatController extends Controller
      */
     public function store(StoreMasterPangkatRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        $validated['pendidikan_id'] = $validated['pendidikan'];
-        unset($validated['pendidikan']);
+        try {
+            $validated = $request->validated();
+            $validated['pendidikan_id'] = $validated['pendidikan'];
+            unset($validated['pendidikan']);
 
-        $pangkat = MasterPangkat::create($validated);
+            $pangkat = MasterPangkat::create($validated);
 
-        return ApiResponse::success($pangkat, 'Master Pangkat berhasil ditambahkan.', 201);
+            return ApiResponse::success($pangkat, 'Master Pangkat berhasil ditambahkan.', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal menambahkan data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -66,9 +70,18 @@ class MasterPangkatController extends Controller
      */
     public function update(UpdateMasterPangkatRequest $request, MasterPangkat $pangkat): JsonResponse
     {
-        $pangkat->update($request->validated());
+        try {
+            $validated = $request->validated();
 
-        return ApiResponse::success($pangkat, 'Master Pangkat berhasil diperbarui.');
+            $validated['pendidikan_id'] = $validated['pendidikan'];
+            unset($validated['pendidikan']);
+
+            $pangkat->update($validated);
+
+            return ApiResponse::success($pangkat, 'Master Pangkat berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal memperbarui data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -78,7 +91,17 @@ class MasterPangkatController extends Controller
      */
     public function destroy(MasterPangkat $pangkat): JsonResponse
     {
-        $pangkat->delete();
+        try {
+            $pangkat->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return ApiResponse::error(
+                    'Master Pangkat tidak dapat dihapus karena masih digunakan oleh data lain (misal: data pegawai).',
+                    409
+                );
+            }
+            return ApiResponse::error('Gagal menghapus data: ' . $e->getMessage(), 500);
+        }
 
         return ApiResponse::success(null, 'Master Pangkat berhasil dihapus.');
     }

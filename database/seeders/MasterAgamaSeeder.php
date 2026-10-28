@@ -2,15 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\MasterAgama;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MasterAgamaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $agama = [
@@ -23,11 +19,22 @@ class MasterAgamaSeeder extends Seeder
             ['nama' => 'Lainnya'],
         ];
 
-        // Kosongkan tabel sebelum memasukkan data baru
-        MasterAgama::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        foreach ($agama as $item) {
-            MasterAgama::create($item);
+        try {
+            DB::table('master_agama')->truncate();
+
+            $now = now();
+            $data = array_map(fn($item) => array_merge($item, [
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]), $agama);
+
+            DB::table('master_agama')->insert($data);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
+
+        $this->command->info('✅ MasterAgamaSeeder: ' . count($agama) . ' agama di-seed.');
     }
 }

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('pegawai_id')->constrained('pegawai')->onDelete('cascade');
 
-            $table->foreignId('master_jabatan_id')->constrained('master_jabatan')->restrictOnDelete();
-            $table->foreignId('master_unit_id')->nullable()->constrained('master_unit')->nullOnDelete();
+            $table->foreignUuid('master_jabatan_id')->constrained('master_jabatan')->restrictOnDelete();
+            $table->foreignUuid('master_unit_id')->nullable()->constrained('master_unit')->nullOnDelete();
             $table->string('no_sk');
             $table->date('tanggal_awal');
             $table->string('file_berkas')->nullable();

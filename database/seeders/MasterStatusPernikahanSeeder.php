@@ -2,15 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\MasterStatusPernikahan;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MasterStatusPernikahanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $statusPernikahan = [
@@ -20,11 +16,23 @@ class MasterStatusPernikahanSeeder extends Seeder
             ['nama' => 'Cerai Mati'],
         ];
 
-        // Kosongkan tabel sebelum memasukkan data baru
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
+        try {
+            DB::table('master_status_pernikahan')->truncate();
 
-        foreach ($statusPernikahan as $status) {
-            MasterStatusPernikahan::create($status);
+            $now = now();
+            $data = array_map(fn($item) => array_merge($item, [
+                'status'     => 'Aktif',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]), $statusPernikahan);
+
+            DB::table('master_status_pernikahan')->insert($data);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
+
+        $this->command->info('✅ MasterStatusPernikahanSeeder: ' . count($statusPernikahan) . ' status di-seed.');
     }
 }

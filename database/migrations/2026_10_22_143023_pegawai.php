@@ -24,9 +24,18 @@ return new class extends Migration
             $table->string('tempat_lahir', 255);
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['Laki-Laki', 'Perempuan']);
-            $table->foreignId('master_agama_id')->constrained('master_agama')->restrictOnDelete();
-            $table->foreignId('master_pendidikan_id')->constrained('master_pendidikan')->restrictOnDelete();
-            $table->foreignId('master_status_pernikahan_id')->constrained('master_status_pernikahan')->restrictOnDelete();
+
+            $table->foreignId('master_agama_id')
+                ->constrained('master_agama')
+                ->restrictOnDelete();
+
+            $table->foreignId('master_pendidikan_id')
+                ->constrained('master_pendidikan')
+                ->restrictOnDelete();
+
+            $table->foreignId('master_status_pernikahan_id')
+                ->constrained('master_status_pernikahan')
+                ->restrictOnDelete();
 
             // Kontak
             $table->string('no_hp', 20)->nullable();
@@ -34,25 +43,57 @@ return new class extends Migration
             $table->string('email', 255)->nullable();
             $table->string('email_rs', 255)->nullable();
 
-            // Alamat KTP
-            $table->foreignId('master_provinsi_id')->constrained('master_provinsi')->onDelete('cascade');
-            $table->foreignId('master_kota_id')->constrained('master_kota')->onDelete('cascade');
-            $table->foreignId('master_kecamatan_id')->constrained('master_kecamatan')->onDelete('cascade');
-            $table->foreignId('master_kelurahan_id')->constrained('master_kelurahan')->onDelete('cascade');
+            // Alamat KTP (wajib)
+            $table->foreignId('master_provinsi_id')
+                ->constrained('master_provinsi')
+                ->restrictOnDelete();
+
+            $table->foreignId('master_kota_id')
+                ->constrained('master_kota')
+                ->restrictOnDelete();
+
+            $table->foreignId('master_kecamatan_id')
+                ->constrained('master_kecamatan')
+                ->restrictOnDelete();
+
+            $table->foreignId('master_kelurahan_id')
+                ->constrained('master_kelurahan')
+                ->restrictOnDelete();
+
             $table->string('alamat', 255);
             $table->string('kode_pos', 10);
 
-            // Alamat Domisili
-            $table->foreignId('master_provinsi_domisili_id')->nullable()->constrained('master_provinsi')->nullOnDelete();
-            $table->foreignId('master_kota_domisili_id')->nullable()->constrained('master_kota')->nullOnDelete();
-            $table->foreignId('master_kecamatan_domisili_id')->nullable()->constrained('master_kecamatan')->nullOnDelete();
-            $table->foreignId('master_kelurahan_domisili_id')->nullable()->constrained('master_kelurahan')->nullOnDelete();
+            // Alamat Domisili (opsional)
+            $table->foreignId('master_provinsi_domisili_id')
+                ->nullable()
+                ->constrained('master_provinsi')
+                ->nullOnDelete();
+
+            $table->foreignId('master_kota_domisili_id')
+                ->nullable()
+                ->constrained('master_kota')
+                ->nullOnDelete();
+
+            $table->foreignId('master_kecamatan_domisili_id')
+                ->nullable()
+                ->constrained('master_kecamatan')
+                ->nullOnDelete();
+
+            $table->foreignId('master_kelurahan_domisili_id')
+                ->nullable()
+                ->constrained('master_kelurahan')
+                ->nullOnDelete();
+
             $table->string('alamat_domisili', 255)->nullable();
             $table->string('kode_pos_domisili', 10)->nullable();
 
             $table->string('foto', 255)->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
+
+            // Index untuk pencarian
+            $table->index('nama');
         });
     }
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('pangkat', 100);
             $table->string('golongan', 50);
-            $table->foreignId('pendidikan_id')->constrained('master_pendidikan')->onDelete('cascade');
+            $table->foreignId('pendidikan_id')->constrained('master_pendidikan')->restrictOnDelete();
             $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
             $table->timestamps();
         });

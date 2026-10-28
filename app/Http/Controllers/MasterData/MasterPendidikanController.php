@@ -9,12 +9,12 @@ use App\Models\MasterPendidikan;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class MasterPendidikanController extends Controller
 {
     /**
      * Menampilkan daftar Master Pendidikan.
-     * Bisa dengan pagination & pencarian.
      *
      * GET /api/v1/master/pendidikan
      */
@@ -23,10 +23,9 @@ class MasterPendidikanController extends Controller
         $query = MasterPendidikan::query();
 
         if ($request->filled('search')) {
-            $query->where('pendidikan', 'like', '%' . $request->search . '%');
+            $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // Pagination (default 10 per halaman)
         $perPage = $request->get('per_page', 10);
         $pendidikan = $query->orderBy('id', 'asc')->paginate($perPage);
 
@@ -40,9 +39,13 @@ class MasterPendidikanController extends Controller
      */
     public function store(StoreMasterPendidikanRequest $request): JsonResponse
     {
-        $pendidikan = MasterPendidikan::create($request->validated());
+        try {
+            $pendidikan = MasterPendidikan::create($request->validated());
 
-        return ApiResponse::success($pendidikan, 'Master Pendidikan berhasil ditambahkan.', 201);
+            return ApiResponse::success($pendidikan, 'Master Pendidikan berhasil ditambahkan.', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal menambahkan data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -62,9 +65,13 @@ class MasterPendidikanController extends Controller
      */
     public function update(UpdateMasterPendidikanRequest $request, MasterPendidikan $pendidikan): JsonResponse
     {
-        $pendidikan->update($request->validated());
+        try {
+            $pendidikan->update($request->validated());
 
-        return ApiResponse::success($pendidikan, 'Master Pendidikan berhasil diperbarui.');
+            return ApiResponse::success($pendidikan, 'Master Pendidikan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal memperbarui data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -74,7 +81,24 @@ class MasterPendidikanController extends Controller
      */
     public function destroy(MasterPendidikan $pendidikan): JsonResponse
     {
-        $pendidikan->delete();
+        if ($pendidikan->pangkat()->exists()) {
+            return ApiResponse::error(
+                'Master Pendidikan tidak dapat dihapus karena masih digunakan oleh data Master Pangkat.',
+                409
+            );
+        }
+
+        try {
+            $pendidikan->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return ApiResponse::error(
+                    'Master Pendidikan tidak dapat dihapus karena masih digunakan oleh data lain.',
+                    409
+                );
+            }
+            return ApiResponse::error('Gagal menghapus data: ' . $e->getMessage(), 500);
+        }
 
         return ApiResponse::success(null, 'Master Pendidikan berhasil dihapus.');
     }

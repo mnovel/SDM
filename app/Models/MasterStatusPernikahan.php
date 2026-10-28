@@ -12,7 +12,7 @@ class MasterStatusPernikahan extends Model
     protected $table = 'master_status_pernikahan';
 
     protected $fillable = [
-        'status_pernikahan',
+        'nama',
         'status',
     ];
 

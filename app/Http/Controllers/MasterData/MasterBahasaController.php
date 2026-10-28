@@ -9,6 +9,7 @@ use App\Models\MasterBahasa;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class MasterBahasaController extends Controller
 {
@@ -23,10 +24,9 @@ class MasterBahasaController extends Controller
         $query = MasterBahasa::query();
 
         if ($request->filled('search')) {
-            $query->where('bahasa', 'like', '%' . $request->search . '%');
+            $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // Pagination (default 10 per halaman)
         $perPage = $request->get('per_page', 10);
         $bahasas = $query->orderBy('id', 'asc')->paginate($perPage);
 
@@ -40,9 +40,13 @@ class MasterBahasaController extends Controller
      */
     public function store(StoreMasterBahasaRequest $request): JsonResponse
     {
-        $bahasa = MasterBahasa::create($request->validated());
+        try {
+            $bahasa = MasterBahasa::create($request->validated());
 
-        return ApiResponse::success($bahasa, 'Master Bahasa berhasil ditambahkan.', 201);
+            return ApiResponse::success($bahasa, 'Master Bahasa berhasil ditambahkan.', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal menambahkan data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -62,9 +66,13 @@ class MasterBahasaController extends Controller
      */
     public function update(UpdateMasterBahasaRequest $request, MasterBahasa $bahasa): JsonResponse
     {
-        $bahasa->update($request->validated());
+        try {
+            $bahasa->update($request->validated());
 
-        return ApiResponse::success($bahasa, 'Master Bahasa berhasil diperbarui.');
+            return ApiResponse::success($bahasa, 'Master Bahasa berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal memperbarui data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -74,7 +82,17 @@ class MasterBahasaController extends Controller
      */
     public function destroy(MasterBahasa $bahasa): JsonResponse
     {
-        $bahasa->delete();
+        try {
+            $bahasa->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return ApiResponse::error(
+                    'Master Bahasa tidak dapat dihapus karena masih digunakan oleh data lain (misal: data pegawai).',
+                    409
+                );
+            }
+            return ApiResponse::error('Gagal menghapus data: ' . $e->getMessage(), 500);
+        }
 
         return ApiResponse::success(null, 'Master Bahasa berhasil dihapus.');
     }

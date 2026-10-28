@@ -23,7 +23,7 @@ class MasterLiburController extends Controller
         $query = MasterLibur::query();
 
         if ($request->filled('search')) {
-            $query->where('libur', 'like', '%' . $request->search . '%');
+            $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
         // Pagination (default 10 per halaman)

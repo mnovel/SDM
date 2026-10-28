@@ -9,6 +9,7 @@ use App\Models\MasterAgama;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class MasterAgamaController extends Controller
 {
@@ -23,10 +24,9 @@ class MasterAgamaController extends Controller
         $query = MasterAgama::query();
 
         if ($request->filled('search')) {
-            $query->where('nama_agama', 'like', '%' . $request->search . '%');
+            $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // Pagination (default 10 per halaman)
         $perPage = $request->get('per_page', 10);
         $agamas = $query->orderBy('id', 'asc')->paginate($perPage);
 
@@ -40,9 +40,13 @@ class MasterAgamaController extends Controller
      */
     public function store(StoreMasterAgamaRequest $request): JsonResponse
     {
-        $agama = MasterAgama::create($request->validated());
+        try {
 
-        return ApiResponse::success($agama, 'Master Agama berhasil ditambahkan.', 201);
+            $agama = MasterAgama::create($request->validated());
+            return ApiResponse::success($agama, 'Master Agama berhasil ditambahkan.', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal menambahkan data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -62,9 +66,13 @@ class MasterAgamaController extends Controller
      */
     public function update(UpdateMasterAgamaRequest $request, MasterAgama $agama): JsonResponse
     {
-        $agama->update($request->validated());
+        try {
+            $agama->update($request->validated());
 
-        return ApiResponse::success($agama, 'Master Agama berhasil diperbarui.');
+            return ApiResponse::success($agama, 'Master Agama berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal memperbarui data: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -74,7 +82,17 @@ class MasterAgamaController extends Controller
      */
     public function destroy(MasterAgama $agama): JsonResponse
     {
-        $agama->delete();
+        try {
+            $agama->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return ApiResponse::error(
+                    'Master Agama tidak dapat dihapus karena masih digunakan oleh data lain (misal: data pegawai).',
+                    409
+                );
+            }
+            return ApiResponse::error('Gagal menghapus data: ' . $e->getMessage(), 500);
+        }
 
         return ApiResponse::success(null, 'Master Agama berhasil dihapus.');
     }

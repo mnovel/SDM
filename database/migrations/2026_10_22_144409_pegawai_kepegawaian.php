@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
+    /**mas
      * Run the migrations.
      */
     public function up(): void
@@ -15,9 +15,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('pegawai_id')->constrained('pegawai')->onDelete('cascade');
 
-            $table->string('status_pegawai');
-            $table->foreignId('unit_kerja_id')->nullable()->constrained('master_unit');
-            $table->foreignId('jabatan_id')->nullable()->constrained('master_jabatan');
+            $table->foreignId('master_status_pegawai_id')->constrained('master_status_pegawai')->restrictOnDelete();
+            $table->foreignUuid('master_unit_id')->constrained('master_unit');
+            $table->foreignUuid('master_jabatan_id')->constrained('master_jabatan');
 
             $table->date('tmt_awal');
             $table->date('tmt_akhir')->nullable();

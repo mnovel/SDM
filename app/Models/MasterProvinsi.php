@@ -12,12 +12,26 @@ class MasterProvinsi extends Model
     protected $table = 'master_provinsi';
 
     protected $fillable = [
-        'nama',
+        'code',
+        'name',
+        'meta',
     ];
 
+    protected $casts = [
+        'meta' => 'array',
+    ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
+     * Relasi ke kota.
+     * master_kota.province_code → master_provinsi.code
+     */
     public function kota()
     {
-        return $this->hasMany(MasterKota::class, 'master_provinsi_id');
+        return $this->hasMany(MasterKota::class, 'province_code', 'code');
     }
 }

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pegawai extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $table = 'pegawai';
 
@@ -113,8 +114,6 @@ class Pegawai extends Model
     // RELASI KE DATA PEGAWAI (HasOne / HasMany)
     // ==========================================
 
-    // Data Kepegawaian (Bisa jadi HasMany jika ada riwayat status,
-    // tapi jika hanya butuh status aktif, bisa pakai hasOne)
     public function kepegawaian_aktif()
     {
         return $this->hasOne(PegawaiKepegawaian::class)->where('is_aktif', true);
@@ -125,13 +124,11 @@ class Pegawai extends Model
         return $this->hasMany(PegawaiKepegawaian::class);
     }
 
-    // Data Nakes
     public function nakes()
     {
         return $this->hasOne(PegawaiNakes::class);
     }
 
-    // Data Rekening
     public function rekening()
     {
         return $this->hasOne(PegawaiRekening::class);

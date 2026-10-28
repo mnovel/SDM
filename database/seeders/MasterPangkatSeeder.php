@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\MasterPendidikan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -9,63 +10,88 @@ class MasterPangkatSeeder extends Seeder
 {
     public function run(): void
     {
-        // Data diurutkan dari Golongan Terendah (I/A) hingga Tertinggi (XIII BLUD)
-        // Format: [golongan, pangkat, pendidikan_id]
+        // Lookup: nama pendidikan → id
+        $pendidikanIds = MasterPendidikan::pluck('id', 'nama')->toArray();
+
+        // Validasi dependency
+        if (empty($pendidikanIds)) {
+            $this->command->error('❌ MasterPendidikan kosong. Jalankan MasterPendidikanSeeder dulu.');
+            return;
+        }
+
+        // Format: [golongan, pangkat, nama_pendidikan (bukan id)]
         $data = [
-            // ================= GOLONGAN I (PNS) =================
-            ['golongan' => 'I/A',        'pangkat' => 'Juru Muda',               'pendidikan_id' => 1],  // SD
-            ['golongan' => 'I/B',        'pangkat' => 'Juru Muda Tingkat I',     'pendidikan_id' => 1],  // SD
-            ['golongan' => 'I/C',        'pangkat' => 'Juru',                    'pendidikan_id' => 1],  // SD
-            ['golongan' => 'I/D',        'pangkat' => 'Juru Tingkat 1',          'pendidikan_id' => 2],  // SLTP
+            // GOLONGAN I
+            ['golongan' => 'I/A',  'pangkat' => 'Juru Muda',               'pendidikan' => 'SD'],
+            ['golongan' => 'I/B',  'pangkat' => 'Juru Muda Tingkat I',     'pendidikan' => 'SD'],
+            ['golongan' => 'I/C',  'pangkat' => 'Juru',                    'pendidikan' => 'SD'],
+            ['golongan' => 'I/D',  'pangkat' => 'Juru Tingkat 1',          'pendidikan' => 'SLTP'],
 
-            // ================= GOLONGAN II (PNS) =================
-            ['golongan' => 'II/A',       'pangkat' => 'Pengatur Muda',           'pendidikan_id' => 2],  // SLTP
-            ['golongan' => 'II/B',       'pangkat' => 'Pengatur Muda Tingkat 1', 'pendidikan_id' => 4],  // D1
-            ['golongan' => 'II/C',       'pangkat' => 'Pengatur',                'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'II/D',       'pangkat' => 'Pengatur Tingkat 1',      'pendidikan_id' => 3],  // SLTA
+            // GOLONGAN II
+            ['golongan' => 'II/A', 'pangkat' => 'Pengatur Muda',           'pendidikan' => 'SLTP'],
+            ['golongan' => 'II/B', 'pangkat' => 'Pengatur Muda Tingkat 1', 'pendidikan' => 'D1'],
+            ['golongan' => 'II/C', 'pangkat' => 'Pengatur',                'pendidikan' => 'SLTA'],
+            ['golongan' => 'II/D', 'pangkat' => 'Pengatur Tingkat 1',      'pendidikan' => 'SLTA'],
 
-            // ================= GOLONGAN III (PNS) =================
-            ['golongan' => 'III/A',      'pangkat' => 'Penata Muda',             'pendidikan_id' => 8],  // S1
-            ['golongan' => 'III/B',      'pangkat' => 'Penata Muda Tingkat 1',   'pendidikan_id' => 9],  // S2
-            ['golongan' => 'III/C',      'pangkat' => 'Penata',                  'pendidikan_id' => 10], // S3
-            ['golongan' => 'III/D',      'pangkat' => 'Penata Tingkat 1',        'pendidikan_id' => 3],  // SLTA
+            // GOLONGAN III
+            ['golongan' => 'III/A', 'pangkat' => 'Penata Muda',            'pendidikan' => 'S1'],
+            ['golongan' => 'III/B', 'pangkat' => 'Penata Muda Tingkat 1',  'pendidikan' => 'S2'],
+            ['golongan' => 'III/C', 'pangkat' => 'Penata',                 'pendidikan' => 'S3'],
+            ['golongan' => 'III/D', 'pangkat' => 'Penata Tingkat 1',       'pendidikan' => 'SLTA'],
 
-            // ================= GOLONGAN IV (PNS) =================
-            ['golongan' => 'IV/A',       'pangkat' => 'Pembina',                 'pendidikan_id' => 8],  // S1
-            ['golongan' => 'IV/B',       'pangkat' => 'Pembina Tingkat I',       'pendidikan_id' => 8],  // S1
-            ['golongan' => 'IV/C',       'pangkat' => 'Pembina Utama Muda',      'pendidikan_id' => 9],  // S2
-            ['golongan' => 'IV/D',       'pangkat' => 'Pembina Utama Madya',     'pendidikan_id' => 9],  // S2
-            ['golongan' => 'IV/E',       'pangkat' => 'Pembina Utama',           'pendidikan_id' => 9],  // S2
+            // GOLONGAN IV
+            ['golongan' => 'IV/A', 'pangkat' => 'Pembina',                 'pendidikan' => 'S1'],
+            ['golongan' => 'IV/B', 'pangkat' => 'Pembina Tingkat I',       'pendidikan' => 'S1'],
+            ['golongan' => 'IV/C', 'pangkat' => 'Pembina Utama Muda',      'pendidikan' => 'S2'],
+            ['golongan' => 'IV/D', 'pangkat' => 'Pembina Utama Madya',     'pendidikan' => 'S2'],
+            ['golongan' => 'IV/E', 'pangkat' => 'Pembina Utama',           'pendidikan' => 'S2'],
 
-            // ================= GOLONGAN BLUD =================
-            ['golongan' => 'I (BLUD)',   'pangkat' => 'Pratama I (BLUD)',        'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'II (BLUD)',  'pangkat' => 'Pratama II (BLUD)',       'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'III (BLUD)', 'pangkat' => 'Pratama III (BLUD)',      'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'IV',         'pangkat' => 'Pratama IV (BLUD)',       'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'V (BLUD)',   'pangkat' => 'Madya I (BLUD)',          'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'VI (BLUD)',  'pangkat' => 'Madya II (BLUD)',         'pendidikan_id' => 3],  // SLTA
-            ['golongan' => 'VII (BLUD)', 'pangkat' => 'Madya III (BLUD)',        'pendidikan_id' => 6],  // D3
-            ['golongan' => 'VIII (BLUD)', 'pangkat' => 'Madya IV (BLUD)',         'pendidikan_id' => 6],  // D3
-            ['golongan' => 'IX (BLUD)',  'pangkat' => 'Ahli I (BLUD)',           'pendidikan_id' => 8],  // S1
-            ['golongan' => 'X (BLUD)',   'pangkat' => 'Ahli II (BLUD)',          'pendidikan_id' => 8],  // S1
-            ['golongan' => 'XI (BLUD)',  'pangkat' => 'Ahli III (BLUD)',         'pendidikan_id' => 11], // Profesi
-            ['golongan' => 'XII (BLUD)', 'pangkat' => 'Ahli IV (BLUD)',          'pendidikan_id' => 11], // Profesi
-            ['golongan' => 'XIII',       'pangkat' => 'Utama (BLUD)',            'pendidikan_id' => 9],  // S2
+            // GOLONGAN BLUD
+            ['golongan' => 'I (BLUD)',    'pangkat' => 'Pratama I (BLUD)',    'pendidikan' => 'SLTA'],
+            ['golongan' => 'II (BLUD)',   'pangkat' => 'Pratama II (BLUD)',   'pendidikan' => 'SLTA'],
+            ['golongan' => 'III (BLUD)',  'pangkat' => 'Pratama III (BLUD)',  'pendidikan' => 'SLTA'],
+            ['golongan' => 'IV',          'pangkat' => 'Pratama IV (BLUD)',   'pendidikan' => 'SLTA'],
+            ['golongan' => 'V (BLUD)',    'pangkat' => 'Madya I (BLUD)',      'pendidikan' => 'SLTA'],
+            ['golongan' => 'VI (BLUD)',   'pangkat' => 'Madya II (BLUD)',     'pendidikan' => 'SLTA'],
+            ['golongan' => 'VII (BLUD)',  'pangkat' => 'Madya III (BLUD)',    'pendidikan' => 'D3'],
+            ['golongan' => 'VIII (BLUD)', 'pangkat' => 'Madya IV (BLUD)',     'pendidikan' => 'D3'],
+            ['golongan' => 'IX (BLUD)',   'pangkat' => 'Ahli I (BLUD)',       'pendidikan' => 'S1'],
+            ['golongan' => 'X (BLUD)',    'pangkat' => 'Ahli II (BLUD)',      'pendidikan' => 'S1'],
+            ['golongan' => 'XI (BLUD)',   'pangkat' => 'Ahli III (BLUD)',     'pendidikan' => 'Pendidikan Profesi'],
+            ['golongan' => 'XII (BLUD)',  'pangkat' => 'Ahli IV (BLUD)',      'pendidikan' => 'Pendidikan Profesi'],
+            ['golongan' => 'XIII',        'pangkat' => 'Utama (BLUD)',        'pendidikan' => 'S2'],
         ];
 
-        // Tambahkan timestamp dan status ke setiap baris data
-        $insertData = array_map(function ($item) {
-            return array_merge($item, [
-                'status'     => 'Aktif',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }, $data);
+        $now = now();
+        $insertData = [];
 
-        // Kosongkan tabel sebelum memasukkan data baru
-        DB::table('master_pangkat')->truncate();
+        foreach ($data as $item) {
+            $namaPendidikan = $item['pendidikan'];
 
-        // Insert semua data sekaligus
-        DB::table('master_pangkat')->insert($insertData);
+            if (!isset($pendidikanIds[$namaPendidikan])) {
+                $this->command->warn("⚠️  Pendidikan '{$namaPendidikan}' tidak ditemukan, skip: {$item['pangkat']}");
+                continue;
+            }
+
+            $insertData[] = [
+                'golongan'      => $item['golongan'],
+                'pangkat'       => $item['pangkat'],
+                'pendidikan_id' => $pendidikanIds[$namaPendidikan],
+                'status'        => 'Aktif',
+                'created_at'    => $now,
+                'updated_at'    => $now,
+            ];
+        }
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        try {
+            DB::table('master_pangkat')->truncate();
+            DB::table('master_pangkat')->insert($insertData);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
+
+        $this->command->info('✅ MasterPangkatSeeder: ' . count($insertData) . ' pangkat di-seed.');
     }
 }

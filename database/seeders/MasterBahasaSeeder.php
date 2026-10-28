@@ -2,15 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\MasterBahasa;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MasterBahasaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $bahasa = [
@@ -26,11 +22,22 @@ class MasterBahasaSeeder extends Seeder
             ['nama' => 'Italia'],
         ];
 
-        // Kosongkan tabel sebelum memasukkan data baru
-        MasterBahasa::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        foreach ($bahasa as $item) {
-            MasterBahasa::create($item);
+        try {
+            DB::table('master_bahasa')->truncate();
+
+            $now = now();
+            $data = array_map(fn($item) => array_merge($item, [
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]), $bahasa);
+
+            DB::table('master_bahasa')->insert($data);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
+
+        $this->command->info('✅ MasterBahasaSeeder: ' . count($bahasa) . ' bahasa di-seed.');
     }
 }
